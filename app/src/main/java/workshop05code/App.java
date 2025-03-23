@@ -38,14 +38,18 @@ public class App {
 
         wordleDatabaseConnection.createNewDatabase("words.db");
         if (wordleDatabaseConnection.checkIfConnectionDefined()) {
-            System.out.println("Wordle created and connected.");
+            logger.log(Level.INFO, "Wordle created and connected.");
+            // System.out.println("Wordle created and connected.");
         } else {
+            logger.log(Level.WARNING, "Not able to connect. Sorry!");
             System.out.println("Not able to connect. Sorry!");
             return;
         }
         if (wordleDatabaseConnection.createWordleTables()) {
-            System.out.println("Wordle structures in place.");
+            logger.log(Level.INFO, "Wordle structures in place.");
+            // System.out.println("Wordle structures in place.");
         } else {
+            logger.log(Level.WARNING, "Not able to launch. Sorry!");
             System.out.println("Not able to launch. Sorry!");
             return;
         }
@@ -56,14 +60,19 @@ public class App {
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
-                wordleDatabaseConnection.addValidWord(i, line);
-                i++;
+                if (line.length() != 4) {
+                    logger.log(Level.SEVERE, "Invalid word length in data.txt: {0}", line);
+                } else {
+                    wordleDatabaseConnection.addValidWord(i, line);
+                    logger.log(Level.INFO, "Added word to validWords: {0}", line);
+                    i++;
+                }
             }
 
         } catch (IOException e) {
-            System.out.println("Not able to load . Sorry!");
-            System.out.println(e.getMessage());
+            logger.log(Level.WARNING, "Not able to load . Sorry!", e.getMessage());
+            // System.out.println("Not able to load . Sorry!");
+            // System.out.println(e.getMessage());
             return;
         }
 
@@ -77,8 +86,10 @@ public class App {
                 System.out.println("You've guessed '" + guess+"'.");
 
                 if (wordleDatabaseConnection.isValidWord(guess)) { 
+                    logger.log(Level.INFO, "User guessed a correct word: {0}", guess);
                     System.out.println("Success! It is in the the list.\n");
                 }else{
+                    logger.log(Level.INFO, "User guessed an incorrect word: {0}", guess);
                     System.out.println("Sorry. This word is NOT in the the list.\n");
                 }
 
@@ -86,6 +97,8 @@ public class App {
                 guess = scanner.nextLine();
             }
         } catch (NoSuchElementException | IllegalStateException e) {
+            logger.log(Level.WARNING, "Not able to read input. Sorry!", e.getMessage());
+            System.out.println("Not able to read input. Sorry!");
             e.printStackTrace();
         }
 
